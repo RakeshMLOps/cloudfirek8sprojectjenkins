@@ -30,11 +30,11 @@ pipeline {
         sh "docker push ${IMAGE_NAME}:${env.BUILD_ID}"
       }
     }
-    stage('Check K8s Connection') {
+    stage('Kubernetes Deploy') {
       steps {
-        withCredentials([file(credentialsId: 'k8s', variable: 'KUBECONFIG')]) {
+        withCredentials([file(credentialsId: "${k8s}", variable: 'KUBECONFIG')]) {
           sh '''
-            kubectl get pods
+            kubectl get nodes
             kubectl apply -f k8s/deployment.yaml
             kubectl apply -f k8s/service.yaml
           '''
