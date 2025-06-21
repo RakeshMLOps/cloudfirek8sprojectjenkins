@@ -42,8 +42,8 @@ pipeline {
           sh '''
             export KUBECONFIG=/var/lib/jenkins/.kube/config
             kubectl get pods
-            sh "kubectl apply -f k8s/deployment.yaml"
-            sh "kubectl apply -f k8s/service.yaml"
+            kubectl apply -f k8s/deployment.yaml
+            kubectl apply -f k8s/service.yaml
           '''
         }
       }
