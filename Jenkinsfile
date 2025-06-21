@@ -30,6 +30,17 @@ pipeline {
         sh "docker push ${IMAGE_NAME}:${env.BUILD_ID}"
       }
     }
+    stage('Update Kubeconfig') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'aws-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+          sh '''
+            aws sts get-caller-identity
+            aws eks update-kubeconfig --region us-east-1 --name my-cluster
+            kubectl get pods
+          '''
+        }
+      }
+    }
     stage('Check K8s Connection') {
       steps {
         withKubeConfig([credentialsId: 'k8s']) {
