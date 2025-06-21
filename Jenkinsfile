@@ -30,17 +30,10 @@ pipeline {
         sh "docker push ${IMAGE_NAME}:${env.BUILD_ID}"
       }
     }
-    stage('Check K8s Connection (AWS)') {
+    stage('Check K8s Connection') {
       steps {
-        withCredentials([
-          [$class: 'AmazonWebServicesCredentialsBinding',
-            credentialsId: 'aws-creds',
-            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-          ]
-        ]) {
+        withCredentials([file(credentialsId: 'aws-creds', variable: 'KUBECONFIG')]) {
           sh '''
-            export KUBECONFIG=/var/lib/jenkins/.kube/config
             kubectl get pods
             kubectl apply -f k8s/deployment.yaml
             kubectl apply -f k8s/service.yaml
@@ -48,4 +41,5 @@ pipeline {
         }
       }
     }
-   
+  }
+}
