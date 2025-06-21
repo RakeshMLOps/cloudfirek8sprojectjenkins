@@ -4,7 +4,7 @@ pipeline {
     // Configure these in Jenkins credentials
     DOCKER_REGISTRY = 'docker.io'
     IMAGE_NAME      = "your-dockerhub-username/my-flask-app"
-    KUBE_CONFIG_CRED = 'kubeconfig-credentials-id'
+    KUBE_CONFIG_CRED = 'k8s'
   }
   stages {
     stage('Checkout') {
@@ -15,7 +15,7 @@ pipeline {
     stage('Build Docker Image') {
       steps {
         script {
-          docker.withRegistry("https://${DOCKER_REGISTRY}", 'dockerhub-credentials-id') {
+          docker.withRegistry("https://${DOCKER_REGISTRY}", 'dockerhub') {
             def img = docker.build("${IMAGE_NAME}:${env.BUILD_ID}")
             img.push()
             img.push('latest')
