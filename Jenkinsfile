@@ -46,13 +46,6 @@ pipeline {
         }
       }
     }
-    stage('Check K8s Connection (KubeConfig)') {
-      steps {
-        withKubeConfig([credentialsId: 'k8s']) {
-          sh 'kubectl get pods'
-        }
-      }
-    }
     stage('Deploy to Kubernetes') {
       steps {
         withCredentials([file(credentialsId: KUBE_CONFIG_CRED, variable: 'KUBECONFIG')]) {
