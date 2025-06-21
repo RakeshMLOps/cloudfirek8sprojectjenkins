@@ -32,7 +32,7 @@ pipeline {
     }
     stage('Kubernetes Deploy') {
       steps {
-        withCredentials([file(credentialsId: "${k8s}", variable: 'KUBECONFIG')]) {
+        withCredentials([file(credentialsId: "${KUBE_CONFIG_CRED}", variable: 'KUBECONFIG')]) {
           sh '''
             kubectl get nodes
             kubectl apply -f k8s/deployment.yaml
