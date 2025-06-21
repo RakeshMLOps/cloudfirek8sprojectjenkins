@@ -21,20 +21,20 @@ pipeline {
     stage('Docker Login') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
-          bat "docker login -u %USER% -p %PASSWORD% docker.io"
+          sh 'echo $PASSWORD | docker login -u $USER --password-stdin docker.io'
         }
       }
     }
     stage('Push image') {
       steps {
-        bat "docker push ${IMAGE_NAME}:${env.BUILD_ID}"
+        sh "docker push ${IMAGE_NAME}:${env.BUILD_ID}"
       }
     }
     stage('Deploy to Kubernetes') {
       steps {
         withCredentials([file(credentialsId: KUBE_CONFIG_CRED, variable: 'KUBECONFIG')]) {
-          bat "kubectl apply -f k8s\\deployment.yaml"
-          bat "kubectl apply -f k8s\\service.yaml"
+          sh "kubectl apply -f k8s/deployment.yaml"
+          sh "kubectl apply -f k8s/service.yaml"
         }
       }
     }
