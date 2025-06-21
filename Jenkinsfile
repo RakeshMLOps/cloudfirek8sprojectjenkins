@@ -3,7 +3,7 @@ pipeline {
   environment {
     // Configure these in Jenkins credentials
     DOCKER_REGISTRY = 'docker.io'
-    IMAGE_NAME      = "your-dockerhub-username/my-flask-app"
+    IMAGE_NAME      = "cloudfire2025/cloudfire"
     KUBE_CONFIG_CRED = 'k8s'
   }
   stages {
