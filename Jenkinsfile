@@ -32,7 +32,7 @@ pipeline {
     }
     stage('Check K8s Connection') {
       steps {
-        withCredentials([file(credentialsId: 'aws-creds', variable: 'KUBECONFIG')]) {
+        withCredentials([file(credentialsId: 'k8s', variable: 'KUBECONFIG')]) {
           sh '''
             kubectl get pods
             kubectl apply -f k8s/deployment.yaml
