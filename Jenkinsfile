@@ -1,7 +1,6 @@
 pipeline {
   agent any
   environment {
-    // Configure these in Jenkins credentials
     DOCKER_REGISTRY = 'docker.io'
     IMAGE_NAME      = "cloudfire2025/cloudfire"
     KUBE_CONFIG_CRED = 'k8s'
@@ -16,18 +15,25 @@ pipeline {
       steps {
         script {
           docker.withRegistry("https://${DOCKER_REGISTRY}", 'dockerhub') {
-            def img = docker.build("${IMAGE_NAME}:${env.BUILD_ID}")
-            img.push()
-            img.push('latest')
+            docker.build("${IMAGE_NAME}:${env.BUILD_ID}")
           }
+        }
+      }
+    }
+    stage('Push image') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
+          def registry_url = "docker.io"
+          bat "docker login -u %USER% -p %PASSWORD% ${registry_url}"
+          bat "docker push ${IMAGE_NAME}:${env.BUILD_ID}"
         }
       }
     }
     stage('Deploy to Kubernetes') {
       steps {
         withCredentials([file(credentialsId: KUBE_CONFIG_CRED, variable: 'KUBECONFIG')]) {
-          sh "kubectl apply -f k8s/deployment.yaml"
-          sh "kubectl apply -f k8s/service.yaml"
+          bat "kubectl apply -f k8s\\deployment.yaml"
+          bat "kubectl apply -f k8s\\service.yaml"
         }
       }
     }
