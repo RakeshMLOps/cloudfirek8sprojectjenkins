@@ -20,13 +20,17 @@ pipeline {
         }
       }
     }
-    stage('Push image') {
+    stage('Docker Login') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
           def registry_url = "docker.io"
-          bat "docker login -u %USER% -p %PASSWORD% ${registry_url}"
-          bat "docker push ${IMAGE_NAME}:${env.BUILD_ID}"
+          bat "docker login -u $USER -p $PASSWORD ${registry_url}"
         }
+      }
+    }
+    stage('Push image') {
+      steps {
+        bat "docker push ${IMAGE_NAME}:${env.BUILD_ID}"
       }
     }
     stage('Deploy to Kubernetes') {
