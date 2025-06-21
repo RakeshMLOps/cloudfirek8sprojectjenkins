@@ -14,17 +14,14 @@ pipeline {
     stage('Build Docker Image') {
       steps {
         script {
-          docker.withRegistry("https://${DOCKER_REGISTRY}", 'dockerhub') {
-            docker.build("${IMAGE_NAME}:${env.BUILD_ID}")
-          }
+          docker.build("${IMAGE_NAME}:${env.BUILD_ID}")
         }
       }
     }
     stage('Docker Login') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
-          def registry_url = "docker.io"
-          bat "docker login -u $USER -p $PASSWORD ${registry_url}"
+          bat "docker login -u %USER% -p %PASSWORD% docker.io"
         }
       }
     }
