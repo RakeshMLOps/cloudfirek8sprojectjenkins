@@ -30,18 +30,23 @@ pipeline {
         sh "docker push ${IMAGE_NAME}:${env.BUILD_ID}"
       }
     }
-    stage('Update Kubeconfig') {
+    stage('Check K8s Connection (AWS)') {
       steps {
-        withCredentials([usernamePassword(credentialsId: 'aws-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+        withCredentials([
+          [$class: 'AmazonWebServicesCredentialsBinding',
+            credentialsId: 'aws-creds',
+            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+          ]
+        ]) {
           sh '''
-            aws sts get-caller-identity
-            aws eks update-kubeconfig --region us-east-1 --name project
+            export KUBECONFIG=/var/lib/jenkins/.kube/config
             kubectl get pods
           '''
         }
       }
     }
-    stage('Check K8s Connection') {
+    stage('Check K8s Connection (KubeConfig)') {
       steps {
         withKubeConfig([credentialsId: 'k8s']) {
           sh 'kubectl get pods'
